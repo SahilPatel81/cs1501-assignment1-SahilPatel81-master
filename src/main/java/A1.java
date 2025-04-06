@@ -6,6 +6,7 @@ import java.util.*;
 public class A1 implements A1Interface {//implements A1Interface
     private StringBuilder currentString;
     Set<String> result;
+	//Created a board to store visited squares
 	int[][] visitedSquares = { {0,0,0,0,0,0,0,0,0,0},
 							 {0,0,0,0,0,0,0,0,0,0},
 							 {0,0,0,0,0,0,0,0,0,0},
@@ -24,40 +25,33 @@ public class A1 implements A1Interface {//implements A1Interface
 		{
 			for (int j = 0; j < boggleBoard.length; j++)
 			{
-				resetBoard(boggleBoard);
+				resetBoard(boggleBoard);//Reset the visited square board
 				currentString = new StringBuilder();
-				if(boggleBoard[i][j] == '*'){
+				if(boggleBoard[i][j] == '*'){//handle the * character. Loop from A to Z.
 					visitedSquares[i][j] = 1;
 					for(char nChar = 'A'; nChar <= 'Z'; nChar++){
 						currentString.append(nChar);						
 						backTrack(i, j, 0, wordLength, boggleBoard, dictionary);
 						currentString.deleteCharAt(currentString.length()-1);
 					}
-					
 				}else{
 					currentString.append(boggleBoard[i][j]);
 					visitedSquares[i][j] = 1;
-					//boggleBoard[i][j] = Character.toUpperCase(boggleBoard[i][j]);
 					backTrack(i, j, 0, wordLength, boggleBoard, dictionary);
-				}
-				
-				
+				}	
 			}
 		}
-
         return result;
-
     }
 
 
-    //reset all characters to lower case
+    //reset visited squares to 0
 	private void resetBoard(char[][] boggleBoard){
 		for (int i = 0; i < boggleBoard.length; i++)
 		{
 			for (int j = 0; j < boggleBoard.length; j++)
 			{
 				visitedSquares[i][j] = 0;
-				//boggleBoard[i][j] = Character.toLowerCase(boggleBoard[i][j]);
 			}
 		}
 	}
@@ -66,58 +60,54 @@ public class A1 implements A1Interface {//implements A1Interface
     private void backTrack(int row, int col, int depth, int wordLength, char[][] boggleBoard, DictInterface dictionary){
         //Loop in all 8 directions
 		for(int direction=0; direction<8; direction++){
+			//Check if it is a valid square to visit
 			if(isValid(row, col, direction, boggleBoard)){
 				char nChar = nextChar(row, col, direction, boggleBoard);
-				if (nChar == '*') {
+				if (nChar == '*') {//Handles * character, loops from A to Z.
 					for(char c = 'A'; c <= 'Z'; c++){
 						executeSearch(c, direction, row, col, depth, wordLength, boggleBoard, dictionary);
 					}
 				}else{
 					executeSearch(nChar, direction, row, col, depth, wordLength, boggleBoard, dictionary);
-				}
-				
+				}			
 			}
-
 		}
 	}
 
 	private void executeSearch(char nChar, int direction, int row, int col, int depth, int wordLength, char[][] boggleBoard, DictInterface dictionary){
 		currentString.append(nChar);
-				//mark the letter as used
-				Coordinates nextCoords = nextCoordinates(row, col, direction);
-				visitedSquares[nextCoords.row][nextCoords.col] = 1;
-				//boggleBoard[nextCoords.row][nextCoords.col] = Character.toUpperCase(boggleBoard[nextCoords.row][nextCoords.col]);
-				int res = dictionary.searchPrefix(currentString);
+		//mark the letter as visited
+		Coordinates nextCoords = nextCoordinates(row, col, direction);
+		visitedSquares[nextCoords.row][nextCoords.col] = 1;
+		int res = dictionary.searchPrefix(currentString);//call dictionary object to search prefix or word
 
-				if(res == 1){ //prefix but not word
-					if (currentString.length() != wordLength ) {
-						backTrack(nextCoords.row, nextCoords.col, depth + 1, wordLength, boggleBoard, dictionary);
-					}
+		if(res == 1){ //prefix but not word
+			if (currentString.length() != wordLength ) {
+				backTrack(nextCoords.row, nextCoords.col, depth + 1, wordLength, boggleBoard, dictionary);
+			}
 					
-				}
-				if(res == 2){ //word but not prefix
-					if(currentString.length() == wordLength){
-                        result.add(currentString.toString());
-					}
-				}
+		}
+		if(res == 2){ //word but not prefix
+			if(currentString.length() == wordLength){
+                result.add(currentString.toString());
+			}
+		}
 
-				if(res == 3){ //word and prefix
-					//TODO: Write the code for the word and prefix case
-					if(currentString.length() == wordLength){
-						result.add(currentString.toString());
-					}
-					backTrack(nextCoords.row, nextCoords.col, depth + 1, wordLength, boggleBoard, dictionary);
-				}
+		if(res == 3){ //word and prefix
+			if(currentString.length() == wordLength){
+				result.add(currentString.toString());
+			}
+			backTrack(nextCoords.row, nextCoords.col, depth + 1, wordLength, boggleBoard, dictionary);
+		}
 
-				currentString.deleteCharAt(currentString.length()-1);
-				visitedSquares[nextCoords.row][nextCoords.col] = 0;
+		currentString.deleteCharAt(currentString.length()-1);
+		visitedSquares[nextCoords.row][nextCoords.col] = 0;
 	}
 
-    //is the letter already used (upper case) or are we at an edge of the board?
+    //is the letter already visited or are we at an edge of the board?
 	private boolean isValid(int row, int col, int direction, char[][] boggleBoard){
 		Coordinates coords = nextCoordinates(row, col, direction);
-		//TODO: Write the code to check whether already used / at an edge of the board
-		
+				
 		if(coords.row < 0){
 			return false;
 		}
@@ -131,19 +121,17 @@ public class A1 implements A1Interface {//implements A1Interface
 			return false;
 		}
 
+		//If the letter is visited
 		if (visitedSquares[coords.row][coords.col] == 1) {
 			return false;
 		}
-
-		
+	
+		//If the letter is #
 		if(boggleBoard[coords.row][coords.col] == '#') {
 			return false;
 		}
 		
-		
 		return true;
-
-
     }
 
 
@@ -198,8 +186,6 @@ public class A1 implements A1Interface {//implements A1Interface
 			this.col = col;
 		}
 	}
-
-
 }
 
 
