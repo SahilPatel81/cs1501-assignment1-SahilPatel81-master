@@ -3,7 +3,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
-public class A1  {//implements A1Interface
+public class A1 implements A1Interface {//implements A1Interface
     private StringBuilder currentString;
     Set<String> result;
 	int[][] visitedSquares = { {0,0,0,0,0,0,0,0,0,0},
